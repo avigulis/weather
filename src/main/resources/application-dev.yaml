@@ -1,0 +1,18 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+feign:
+  client:
+    config:
+      ipstackClient:
+        loggerLevel: full
+      openweatherClient:
+        loggerLevel: full
+
+logging.level.org.assignment.weather.geolocation.IpstackClient: DEBUG
+logging.level.org.assignment.weather.weather.OpenweatherClient: DEBUG
+logging.level.org.hibernate.type: TRACE
+logging.level.feign.Logger: DEBUG

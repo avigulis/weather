@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: weather
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 12000
+
+feign:
+  hystrix:
+    enabled: true
+
+weather:
+    providers:
+      geolocation:
+        url: http://api.ipstack.com/
+        api-key: 9bd804d4eaba9f256ba489d1d007e198
+      weather:
+        url: http://api.openweathermap.org/data/2.5/weather
+        api-key: c8ece61820d4b85a1b5a3b4ae174dd9e

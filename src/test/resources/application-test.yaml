@@ -1,0 +1,19 @@
+feign:
+  client:
+    config:
+      ipstackClient:
+        loggerLevel: full
+      openweatherClient:
+        loggerLevel: full
+
+logging.level.org.assignment.weather.geolocation.IpstackClient: DEBUG
+logging.level.org.assignment.weather.weather.OpenweatherClient: DEBUG
+
+weather:
+  providers:
+    geolocation:
+      url: http://localhost:${wiremock.server.port:0}/
+      api-key: 1a2s3s4d
+    weather:
+      url: http://localhost:${wiremock.server.port:0}/data/2.5/weather
+      api-key: 4a3s2s1d

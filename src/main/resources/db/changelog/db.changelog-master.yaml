@@ -1,0 +1,238 @@
+databaseChangeLog:
+  - changeSet:
+      id: geolocation_queries
+      author: aviguis
+      context: main
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: geolocation_queries
+
+      changes:
+        - createSequence:
+            sequenceName: geolocation_queries_seq
+
+        - createTable:
+            tableName: geolocation_queries
+            columns:
+              - column:
+                  name: geolocation_query_id
+                  type: int8
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: geolocation_query_pkey
+                    nullable: false
+              - column:
+                  name: entity_created
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_updated
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_version
+                  type: int8
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ip_address
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: decimal(10, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: decimal(10, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: response
+                  type: text
+                  constraints:
+                    nullable: true
+
+        - createIndex:
+            columns:
+              - column:
+                  name: ip_address
+                  type: varchar(50)
+            indexName: idx_geolocation_queries_ip_address
+            tableName: geolocation_queries
+            unique: false
+
+  - changeSet:
+      id: weather_queries
+      author: aviguis
+      context: main
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: weather_queries
+
+      changes:
+        - createSequence:
+            sequenceName: weather_queries_seq
+
+        - createTable:
+            tableName: weather_queries
+            columns:
+              - column:
+                  name: weather_query_id
+                  type: int8
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: weather_query_pkey
+                    nullable: false
+              - column:
+                  name: entity_created
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_updated
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_version
+                  type: int8
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: decimal(10, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: decimal(10, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: temperature
+                  type: float(8)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: units
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: humidity
+                  type: int4
+                  constraints:
+                    nullable: true
+              - column:
+                  name: pressure
+                  type: int4
+                  constraints:
+                    nullable: true
+              - column:
+                  name: geolocation_query_id
+                  type: int8
+                  constraints:
+                    nullable: true
+              - column:
+                  name: response
+                  type: text
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseColumnNames: geolocation_query_id
+            baseTableName: weather_queries
+            constraintName: fk_weather_queries_geolocation_queries
+            referencedColumnNames: geolocation_query_id
+            referencedTableName: geolocation_queries
+            deferrable: false
+            initiallyDeferred: false
+
+        - createIndex:
+            columns:
+              - column:
+                  name: latitude
+                  type: decimal(10, 6)
+              - column:
+                  name: longitude
+                  type: decimal(10, 6)
+            indexName: idx_weather_queries
+            tableName: weather_queries
+            unique: false
+
+  - changeSet:
+      id: time_zones
+      author: aviguis
+      context: main
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: time_zones
+
+      changes:
+        - createSequence:
+            sequenceName: time_zones_seq
+
+        - createTable:
+            tableName: time_zones
+            columns:
+              - column:
+                  name: time_zone_id
+                  type: int8
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: time_zone_pkey
+                    nullable: false
+              - column:
+                  name: zone_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: dst_enabled
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dst_offset
+                  type: int(4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: raw_offset
+                  type: int(4)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: time_zones_data
+      author: aviguis
+      context: main
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: select count(*) from time_zones
+
+      changes:
+        - customChange:
+            class: org.assignment.weather.timezone.LoadTimeZone
+            params:
+              - param:
+                  name: tableName
+                  value: time_zones
