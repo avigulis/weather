@@ -1,6 +1,9 @@
 spring:
   application:
     name: weather
+  cache:
+    type: caffeine
+    cache-names: openweather, ipstack
 
 hystrix:
   command:
@@ -9,7 +12,6 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 12000
-
 feign:
   hystrix:
     enabled: true
